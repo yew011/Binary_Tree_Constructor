@@ -1,0 +1,34 @@
+Base (Abstract) Class => Binary_Tree,
+--- member variable:
+    - the number of levels,
+    - the number of nodes, only valid for complete tree,
+    - the selection option: level_node_
+    - the complete flag, bool type
+    - the tree_root_, not allowed to be set by user
+
+--- member function:
+    - virtual function => construct_, return the pointer to the node
+    - virtual function => print the tree, (maybe)
+
+
+Ordinary_Binary_Tree : Binary_Tree
+--- member variable:
+    - none
+
+--- member function:
+    - construct_, return the pointer to the node,
+      fill in the node value, like binary tree hashing,
+    - virtual function => print the tree, (maybe)
+      not implemented,
+
+Binary_Search_Tree : Binary_Tree
+--- member variable:
+    - none
+
+--- member function:
+    - construct_, return the pointer to the node,
+      fill in the node value, based on the BST order,
+      need to consider the case, of incomplete tree,
+    - virtual function => print the tree, (maybe)
+      not implemented,
+    - explicit destructor required to clean up the mess,
