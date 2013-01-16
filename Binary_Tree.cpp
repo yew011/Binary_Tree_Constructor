@@ -2,6 +2,8 @@
 #include <queue>
 #include <cerrno>
 #include <cstring>
+#include <cstdlib>
+#include <list>
 
 #define OPTION_LEVEL      true
 #define OPTION_NODE       false
@@ -61,6 +63,7 @@ public:
 
   virtual int construct_() = 0;
   virtual void print_() = 0;
+  virtual node * get_root_() = 0;
 };
 
 
@@ -97,13 +100,14 @@ public:
   }
   int construct_();
   void print_();
+  node * get_root_();
 };
 
 int Ordinary_Binary_Tree :: construct_(){
   node * temp_root_ = NULL;
   // sanity check.
   if( ( this->level_node_ == OPTION_LEVEL &&
-	this->level_ == 0 ) || 
+	this->levels_ == 0 ) || 
       ( this->level_node_ == OPTION_NODE &&
 	this->nodes_num_ == 0 ) ){
 	this->tree_root_ = temp_root_;
@@ -119,13 +123,13 @@ int Ordinary_Binary_Tree :: construct_(){
       this->levels_++;
   }
   // malloc the nodes as an array.
-  temp_root_ = ( node * )malloc( this->nodes_num_*sizeof(node)+1 );
+  temp_root_ = ( node * )malloc( (this->nodes_num_+1)*sizeof(node) );
   if( errno != 0 )
     cout << "Error: " << strerror(errno) << endl;
+  for( int i = 0; i < this->nodes_num_+1; i++ )
+    temp_root_[i].value_ = i;
   // for complete tree.
   if( this->complete_ == OPTION_COMPLETE){
-    for( int i = 0; i < this->nodes_num_+1; i++ )
-      temp_root_[i].value_ = i;
     unsigned int temp_nodes_count_ = 0;
     for( int i = 1; i < ( (unsigned int)1 << (this->levels_-1) ); i++ ){
       if( 2*i <= this->nodes_num_ )
@@ -138,27 +142,75 @@ int Ordinary_Binary_Tree :: construct_(){
   else{
     list< node * > temp_list_[2];
     unsigned int list_select_ = 0;
-    list_select_[i].push_back( &temp_root_[1] );
+    unsigned int assign_idx_ = 1;
+    bool break_cond_ = false;
+    temp_list_[list_select_%2].push_back( &temp_root_[1] );
     // node assignment logic.
-
-  }
+    while( 1 ){
+      //// iterate through the list[i]
+      for( list< node * >::iterator it = temp_list_[list_select_%2].begin();
+	   it != temp_list_[list_select_%2].end(); ++it ){
+	if( (rand() / (double) RAND_MAX) > 0.5 ){
+	  //// add new left child
+	  if( (assign_idx_+1) == this->nodes_num_ ){
+	    break_cond_ = true;
+	    break;
+	  }
+	  assign_idx_++;
+	  (*it)->left_ = temp_root_+assign_idx_;
+	}
+	if( (rand() / (double) RAND_MAX) > 0.5 ){
+	  //// add new right child
+	  if( (assign_idx_+1) == this->nodes_num_ ){
+	    break_cond_ = true;
+	    break;
+	  }
+	  assign_idx_++;
+	  (*it)->right_ = temp_root_+assign_idx_;
+	}
+      }
+      if( break_cond_ ){
+	break;
+      }
+      if( temp_list_[(list_select_+1)%2].size() != 0 ){
+	temp_list_[list_select_%2].clear();
+	list_select_++;
+      }
+    }
+  }    
   this->tree_root_ = temp_root_;
   return 0;
 }
 
 void Ordinary_Binary_Tree :: print_(){
-  queue< node * > temp_queue_;
-  temp_queue_.push( this->tree_root_+1 );
+  list< node * > temp_list_[2];
+  unsigned int list_select_ = 0;
+  unsigned int assign_idx_ = 1;
+  bool break_cond_ = false;
+  temp_list_[list_select_%2].push_back( this->tree_root_+1 );
   cout << "Tree value by level : " << endl;
-  while( !temp_queue_.empty() ){
-    if( temp_queue_.front() != NULL ){
-      temp_queue_.push( (( node * )temp_queue_.front())->left_ );
-      temp_queue_.push( (( node * )temp_queue_.front())->right_ );
-      cout << (( node * )temp_queue_.front())->value_ << " ";
+  cout << this->tree_root_[1].value_ << endl;
+  while( !temp_list_[list_select_%2].empty() ){
+    for( list< node * >::iterator it = temp_list_[list_select_%2].begin();
+	 it != temp_list_[list_select_%2].end(); ++it ){
+      if( (*it)->left_ != NULL ){
+	temp_list_[(list_select_+1)%2].push_back( (*it)->left_ );
+	cout << (*it)->left_->value_ << " ";
+      }
+      if( (*it)->right_ != NULL ){
+	temp_list_[(list_select_+1)%2].push_back( (*it)->right_ );
+	cout << (*it)->right_->value_ << " ";
+      }
     }
-    temp_queue_.pop();
+    temp_list_[list_select_%2].clear();
+    list_select_++;
+    cout << endl;
   }
   cout << endl;
+}
+
+node * Ordinary_Binary_Tree :: get_root_(){
+  return this->tree_root_+1;
 }
 
 int main( int argc, char ** argv ){
@@ -168,5 +220,8 @@ int main( int argc, char ** argv ){
   Ordinary_Binary_Tree test_tree_1_(5,0);
   test_tree_1_.construct_();
   test_tree_1_.print_();
+  Ordinary_Binary_Tree test_tree_2_(5,0,OPTION_LEVEL,OPTION_INCOMPLETE);
+  test_tree_2_.construct_();
+  test_tree_2_.print_();
   return 0;
 }
