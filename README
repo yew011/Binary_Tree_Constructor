@@ -4,11 +4,11 @@ Base (Abstract) Class => Binary_Tree,
     - the number of nodes, only valid for complete tree,
     - the selection option: level_node_
     - the complete flag, bool type
-    - the tree_root_, not allowed to be set by user
+    - the tree_root_, not allowed to be set by user, the tree begins from tree_root_+1 (for easier implementation)
 
 --- member function:
     - virtual function => construct_, return the pointer to the node
-    - virtual function => print the tree, (maybe)
+    - virtual function => print the tree, (BFS)
 
 
 Ordinary_Binary_Tree : Binary_Tree
@@ -18,8 +18,9 @@ Ordinary_Binary_Tree : Binary_Tree
 --- member function:
     - construct_, return the pointer to the node,
       fill in the node value, like binary tree hashing,
-    - virtual function => print the tree, (maybe)
-      not implemented,
+    - virtual function => print the tree, (BFS), should be refined for tree level printout,
+      	      	       => gonna require cumbersome formatting,
+      
 
 Binary_Search_Tree : Binary_Tree
 --- member variable:
@@ -28,7 +29,14 @@ Binary_Search_Tree : Binary_Tree
 --- member function:
     - construct_, return the pointer to the node,
       fill in the node value, based on the BST order,
-      need to consider the case, of incomplete tree,
-    - virtual function => print the tree, (maybe)
-      not implemented,
+
+      => for incomplete tree, need to choose between fixed level and fixed number of nodes.
+      => for fixed level, fill up the tree, with probability 50%, to the required level,
+      => for fixed number of nodes, fill up the tree, with probability 50%, to the required number of nodes.
+      => if so unlucky, no node is filled in this level, the node generating process for this level.
+      the probability used in generating it require further adjustment.
+
+
+    - virtual function => print the tree, BFS
     - explicit destructor required to clean up the mess,
+      => for incomplete tree, may need to call a recursive function to delete/free the resource.
