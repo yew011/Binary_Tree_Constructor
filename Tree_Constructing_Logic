@@ -1,0 +1,29 @@
+   
+  A                        postion of A : 3
+ / \                       / location : 2, \ location : 4
+B   C
+
+     A                     position of A : 6
+   /   \                   / location : 4, \ location : 8
+  B     C
+ / \   / \
+D   E F   G
+
+           A               position of A : 12
+      /         \          / location : 7, \ location : 17
+     B           C
+   /   \       /   \
+  D     E     F     G
+ / \   / \   / \   / \
+H   I J   K L   M N   O
+
+
+                       A                   position of A : 24
+            /                     \        / location : 13, \ location : 25
+           B                       C
+      /         \             /         \
+     D           E           F           G
+   /   \       /   \       /   \       /   \
+  H     I     J     K     L     M     N     O
+ / \   / \   / \   / \   / \   / \   / \   / \
+P   Q R   S T   U V   W X   Y Z   1 2   3 4   5

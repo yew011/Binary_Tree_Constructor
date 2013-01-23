@@ -1,6 +1,8 @@
 #include <iostream>
+#include <iomanip>
 #include <queue>
 #include <cerrno>
+#include <ctime>
 #include <cstring>
 #include <cstdlib>
 #include <list>
@@ -127,7 +129,7 @@ int Ordinary_Binary_Tree :: construct_(){
   if( errno != 0 )
     cout << "Error: " << strerror(errno) << endl;
   for( int i = 0; i < this->nodes_num_+1; i++ )
-    temp_root_[i].value_ = i;
+    temp_root_[i].value_ = (int)'A'+i;
   // for complete tree.
   if( this->complete_ == OPTION_COMPLETE){
     unsigned int temp_nodes_count_ = 0;
@@ -144,29 +146,30 @@ int Ordinary_Binary_Tree :: construct_(){
     unsigned int list_select_ = 0;
     unsigned int assign_idx_ = 1;
     bool break_cond_ = false;
+    srand( time(NULL) );
     temp_list_[list_select_%2].push_back( &temp_root_[1] );
+    cout << "put first." << endl;
     // node assignment logic.
     while( 1 ){
-      //// iterate through the list[i]
       for( list< node * >::iterator it = temp_list_[list_select_%2].begin();
 	   it != temp_list_[list_select_%2].end(); ++it ){
-	if( (rand() / (double) RAND_MAX) > 0.5 ){
-	  //// add new left child
+	if( (rand() / (double) RAND_MAX) > 0.3 ){
 	  if( (assign_idx_+1) == this->nodes_num_ ){
 	    break_cond_ = true;
 	    break;
 	  }
 	  assign_idx_++;
 	  (*it)->left_ = temp_root_+assign_idx_;
+	  temp_list_[(list_select_+1)%2].push_back(temp_root_+assign_idx_);
 	}
-	if( (rand() / (double) RAND_MAX) > 0.5 ){
-	  //// add new right child
+	if( (rand() / (double) RAND_MAX) > 0.3 ){
 	  if( (assign_idx_+1) == this->nodes_num_ ){
 	    break_cond_ = true;
 	    break;
 	  }
 	  assign_idx_++;
 	  (*it)->right_ = temp_root_+assign_idx_;
+	  temp_list_[(list_select_+1)%2].push_back(temp_root_+assign_idx_);
 	}
       }
       if( break_cond_ ){
@@ -186,25 +189,93 @@ void Ordinary_Binary_Tree :: print_(){
   list< node * > temp_list_[2];
   unsigned int list_select_ = 0;
   unsigned int assign_idx_ = 1;
+  unsigned int temp_levels_ = this->levels_;
   bool break_cond_ = false;
+
   temp_list_[list_select_%2].push_back( this->tree_root_+1 );
   cout << "Tree value by level : " << endl;
-  cout << this->tree_root_[1].value_ << endl;
-  while( !temp_list_[list_select_%2].empty() ){
-    for( list< node * >::iterator it = temp_list_[list_select_%2].begin();
-	 it != temp_list_[list_select_%2].end(); ++it ){
-      if( (*it)->left_ != NULL ){
-	temp_list_[(list_select_+1)%2].push_back( (*it)->left_ );
-	cout << (*it)->left_->value_ << " ";
+  // the first level_.
+  cout << setfill( ' ' )
+       << setw( (temp_levels_-2) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) )
+       << (char)this->tree_root_[1].value_ << endl;
+  while( temp_levels_ > 1 ){
+    temp_levels_--;
+    for( list< node * >::iterator it = temp_list_[list_select_%2].begin(); ; ){
+      if( (*it) != NULL ){
+	if( (*it)->left_ != NULL ){
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ' << '/';
+	} else {
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ' << ' ';
+	}
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 0:(3*( (unsigned int)1<<(temp_levels_-2) )-1) )
+	     << ' ';
+	if( (*it)->right_ != NULL ){
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:(3*( (unsigned int)1<<(temp_levels_-2) )-1) ) << '\\';
+	} else {
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:(3*( (unsigned int)1<<(temp_levels_-2) )-1) ) << ' ';
+	}
+      } else {
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ' << ' ';
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 0:(3*( (unsigned int)1<<(temp_levels_-2) )-1) )
+	     << ' ';
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 1:(3*( (unsigned int)1<<(temp_levels_-2) )-1) ) << ' ';
       }
-      if( (*it)->right_ != NULL ){
-	temp_list_[(list_select_+1)%2].push_back( (*it)->right_ );
-	cout << (*it)->right_->value_ << " ";
+      if( (++it) == temp_list_[list_select_%2].end() ) break;
+      else {
+	cout << setfill( ' ' ) << setw( 3*(temp_levels_-1) ) << ' ' << ' ';
       }
     }
+    cout << endl;
+    // print the next level nodes.
+    for( list< node * >::iterator it = temp_list_[list_select_%2].begin(); ; ){
+      if( (*it) != NULL ){
+	if( (*it)->left_ != NULL ){
+	  temp_list_[(list_select_+1)%2].push_back( (*it)->left_ );
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << (char)(*it)->left_->value_;
+	} else {
+	  temp_list_[(list_select_+1)%2].push_back( NULL );
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ';
+	}
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 3:3*( ((unsigned int)1<<(temp_levels_-2)) ) ) << ' ';
+	if( (*it)->right_ != NULL ){
+	  temp_list_[(list_select_+1)%2].push_back( (*it)->right_ );
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << (char)(*it)->right_->value_;
+	} else {
+	  temp_list_[(list_select_+1)%2].push_back( NULL );
+	  cout << setfill( ' ' )
+	       << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ';
+	}
+      } else {
+	temp_list_[(list_select_+1)%2].push_back( NULL );
+	temp_list_[(list_select_+1)%2].push_back( NULL );
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ';
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 3:3*( ((unsigned int)1<<(temp_levels_-2)) ) ) << ' ';
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ';
+      }
+      if( (++it) == temp_list_[list_select_%2].end() ) break;
+      else {
+	cout << setfill( ' ' )
+	     << setw( (temp_levels_-1) == 0 ? 1:3*( (unsigned int)1<<(temp_levels_-2) ) ) << ' ';
+      }
+    }
+    cout << endl;
     temp_list_[list_select_%2].clear();
     list_select_++;
-    cout << endl;
   }
   cout << endl;
 }
