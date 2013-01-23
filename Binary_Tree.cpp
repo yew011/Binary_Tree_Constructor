@@ -121,15 +121,19 @@ int Ordinary_Binary_Tree :: construct_(){
   else{
     unsigned int temp_nodes_num_ = this->nodes_num_;
     this->levels_ = 0;
-    for( temp_nodes_num_; temp_nodes_num_ > 0; temp_nodes_num_ >> 1 )
-      this->levels_++;
+    if( this->complete_ )
+      for( temp_nodes_num_; temp_nodes_num_ > 0; temp_nodes_num_ >>= 1 )
+	this->levels_++;
+    else
+      this->levels_ = 0;
   }
   // malloc the nodes as an array.
-  temp_root_ = ( node * )malloc( (this->nodes_num_+1)*sizeof(node) );
+  temp_root_ = ( node * ) new node[ this->nodes_num_+1 ];
   if( errno != 0 )
     cout << "Error: " << strerror(errno) << endl;
   for( int i = 0; i < this->nodes_num_+1; i++ )
-    temp_root_[i].value_ = (int)'A'+i;
+    temp_root_[i].value_ = (int)'A'+i-1;
+
   // for complete tree.
   if( this->complete_ == OPTION_COMPLETE){
     unsigned int temp_nodes_count_ = 0;
@@ -145,10 +149,10 @@ int Ordinary_Binary_Tree :: construct_(){
     list< node * > temp_list_[2];
     unsigned int list_select_ = 0;
     unsigned int assign_idx_ = 1;
+    unsigned int temp_levels_ = 0;
     bool break_cond_ = false;
     srand( time(NULL) );
     temp_list_[list_select_%2].push_back( &temp_root_[1] );
-    cout << "put first." << endl;
     // node assignment logic.
     while( 1 ){
       for( list< node * >::iterator it = temp_list_[list_select_%2].begin();
@@ -178,9 +182,16 @@ int Ordinary_Binary_Tree :: construct_(){
       if( temp_list_[(list_select_+1)%2].size() != 0 ){
 	temp_list_[list_select_%2].clear();
 	list_select_++;
+	temp_levels_++;
+	if( temp_levels_ == this->levels_ ) break;
       }
     }
-  }    
+    if( this->complete_==OPTION_INCOMPLETE &&
+	this->level_node_==OPTION_NODE ){
+      this->levels_ = temp_levels_+1;
+      cout << "temp_levels: " << temp_levels_ << endl;
+    }
+  }
   this->tree_root_ = temp_root_;
   return 0;
 }
@@ -191,7 +202,6 @@ void Ordinary_Binary_Tree :: print_(){
   unsigned int assign_idx_ = 1;
   unsigned int temp_levels_ = this->levels_;
   bool break_cond_ = false;
-
   temp_list_[list_select_%2].push_back( this->tree_root_+1 );
   cout << "Tree value by level : " << endl;
   // the first level_.
@@ -291,8 +301,14 @@ int main( int argc, char ** argv ){
   Ordinary_Binary_Tree test_tree_1_(5,0);
   test_tree_1_.construct_();
   test_tree_1_.print_();
+  Ordinary_Binary_Tree test_tree_1_1_(5,45,OPTION_NODE);
+  test_tree_1_1_.construct_();
+  test_tree_1_1_.print_();
   Ordinary_Binary_Tree test_tree_2_(5,0,OPTION_LEVEL,OPTION_INCOMPLETE);
   test_tree_2_.construct_();
   test_tree_2_.print_();
+  Ordinary_Binary_Tree test_tree_3_(5,36,OPTION_NODE,OPTION_INCOMPLETE);
+  test_tree_3_.construct_();
+  test_tree_3_.print_();
   return 0;
 }
