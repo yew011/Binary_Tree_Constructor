@@ -16,27 +16,49 @@ Ordinary_Binary_Tree : Binary_Tree
     - none
 
 --- member function:
-    - construct_, return the pointer to the node,
-      fill in the node value, like binary tree hashing,
-    - virtual function => print the tree, (BFS), should be refined for tree level printout,
-      	      	       => gonna require cumbersome formatting,
-      
-
-Binary_Search_Tree : Binary_Tree
---- member variable:
-    - none
-
---- member function:
-    - construct_, return the pointer to the node,
-      fill in the node value, based on the BST order,
-
-      => for incomplete tree, need to choose between fixed level and fixed number of nodes.
-      => for fixed level, fill up the tree, with probability 50%, to the required level,
-      => for fixed number of nodes, fill up the tree, with probability 50%, to the required number of nodes.
-      => if so unlucky, no node is filled in this level, the node generating process for this level.
-      the probability used in generating it require further adjustment.
+    - construct_: construct the tree, return the pointer to the root.
+    - print_:	  print the tree in amazingly beautiful form.
 
 
-    - virtual function => print the tree, BFS
-    - explicit destructor required to clean up the mess,
-      => for incomplete tree, may need to call a recursive function to delete/free the resource.
+Example of Generated Tree (Output from print_ function) :D~
+
+Complete Tree:
+     B
+   /   \
+  C     D
+ / \   / \
+E   F G   H
+
+Complete Tree:
+                       B
+            /                     \
+           C                       D
+      /         \             /         \
+     E           F           G           H
+   /   \       /   \       /   \       /   \
+  I     J     K     L     M     N     O     P
+ / \   / \   / \   / \   / \   / \   / \   / \
+Q   R S   T U   V W   X Y   Z [   \ ]   ^ _   `
+
+
+Incomplete Tree:
+                       B
+            /                     \
+           C                       D
+                \             /         \
+                 E           F           G
+               /   \       /               \
+              H     I     J                 K
+             / \   /     / \                  
+            L   M N     O   P                  
+
+Incomplete Tree:
+                       B
+            /                     \
+           C                       D
+      /                       /         \
+     E                       F           G
+       \                       \       /   \
+        H                       I     J     K
+       / \                     /     /       \
+      L   M                   N     O         P
